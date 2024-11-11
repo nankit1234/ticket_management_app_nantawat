@@ -63,7 +63,11 @@ npm start
 5.Run backend (FastAPI)
 
 cd ticket_management_app
+.\venv\Scripts\activate
 uvicorn main:app --reload
+
+stop FastAPI
+.\venv\Scripts\deactivate
 
 ///////////////////////////////////////////////////////////////////////////////////
 

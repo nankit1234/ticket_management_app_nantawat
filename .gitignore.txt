@@ -1,0 +1,62 @@
+# 1. Ignore node_modules (React)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# 2. Ignore build or dist folder for React
+/build
+/dist
+
+# 3. Ignore temporary or log files
+*.log
+*.swp
+*.swo
+*.bak
+
+# 4. Ignore Python virtual environment (Backend)
+# If you are using a virtual environment, ignore it
+venv/
+env/
+__pycache__/
+
+# 5. Ignore Python compiled files
+*.pyc
+*.pyo
+
+# 6. Ignore environment variables file (for sensitive data)
+.env
+
+# 7. Ignore database files (if using SQLite)
+*.sqlite3
+
+# 8. Ignore OS-specific files
+# macOS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
+
+# 9. Ignore IDE/editor specific files
+# VS Code
+.vscode/
+
+# JetBrains (IntelliJ, PyCharm, WebStorm)
+.idea/
+
+# 10. Ignore testing files
+*.coverage
+nosetests.xml
+coverage.xml
+*.cover
+
+# 11. Ignore Docker files (if using Docker)
+.docker/
+docker-compose.override.yml
+
+# 12. Ignore log files (if used)
+*.log
+
+# 13. Ignore compiled frontend assets (if using Webpack or similar)
+*.map

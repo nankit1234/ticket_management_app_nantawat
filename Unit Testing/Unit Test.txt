@@ -1,0 +1,238 @@
+1. Unit Test for adding Ticket Steps for adding Ticket
+Create a form for adding a ticket
+Send data through API to create a new ticket
+Update UI when receiving response from API
+Unit Test for adding Ticket
+Frontend - Test for adding Ticket
+
+// TicketForm.test.js
+
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import TicketForm from './TicketForm';  // TicketForm is a ticket adding form.
+import { createTicket } from '../api'; // Functions used to add tickets
+
+jest.mock('../api');  // Mock API function
+
+describe('TicketForm', () => {
+  it('should create a new ticket', async () => {
+    // Mock API response
+    const newTicket = {
+      id: 101,
+      title: 'New Issue',
+      description: 'Description of the new issue',
+      status: 'pending',
+      updated_at: new Date().toISOString(),
+    };
+
+    createTicket.mockResolvedValue(newTicket);  // Mock การตอบกลับจาก API
+
+    render(<TicketForm />);
+
+    // Fill in form fields
+    fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: 'New Issue' } });
+    fireEvent.change(screen.getByLabelText(/Description/i), { target: { value: 'Description of the new issue' } });
+
+    // Submit the form
+    fireEvent.click(screen.getByText(/Submit/i));
+
+    // Wait for API call to finish
+    await waitFor(() => expect(createTicket).toHaveBeenCalledTimes(1));
+
+    // Check if the ticket is added to the UI
+    expect(screen.getByText('New Issue')).toBeInTheDocument();
+    expect(screen.getByText('Description of the new issue')).toBeInTheDocument();
+  });
+});
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
+Backend - Test add Ticket (API)
+
+
+
+// ticket.test.js (Backend - API)
+
+const request = require('supertest');
+const app = require('../app');  // Express server
+const { Ticket } = require('../models');  // Ticket model
+
+jest.mock('../models');  // Mock the Ticket model
+
+describe('POST /tickets', () => {
+  it('should create a new ticket', async () => {
+    const newTicket = {
+      id: 101,
+      title: 'New Issue',
+      description: 'Description of the new issue',
+      status: 'pending',
+      updated_at: new Date().toISOString(),
+    };
+
+    Ticket.create.mockResolvedValue(newTicket);  // Mock the database response
+
+    const response = await request(app)
+      .post('/tickets')
+      .send({
+        title: 'New Issue',
+        description: 'Description of the new issue',
+        status: 'pending',
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body.title).toBe('New Issue');
+    expect(response.body.status).toBe('pending');
+  });
+});
+
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
+2. Unit Test for Ticket Migration (Frontend)
+Frontend - Test for Ticket Migration
+// KanbanBoard.test.js
+
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import KanbanBoard from './KanbanBoard';  // KanbanBoard is a board component.
+import { updateTicket } from '../api';  // Function used to update tickets
+
+jest.mock('../api');  // Mock API function
+
+describe('KanbanBoard', () => {
+  it('should move a ticket from one column to another', async () => {
+    const mockUpdatedTicket = {
+      id: 6,
+      title: 'Test Ticket',
+      description: 'This is a test ticket',
+      status: 'resolved',
+      updated_at: new Date().toISOString(),
+    };
+
+    updateTicket.mockResolvedValue(mockUpdatedTicket);  // Mock การตอบกลับจาก API
+
+    render(<KanbanBoard />);
+
+    // Simulate dragging the ticket from 'pending' to 'resolved'
+    const ticketElement = screen.getByText('Test Ticket');
+    fireEvent.dragStart(ticketElement);
+    fireEvent.dragEnter(screen.getByText('Resolved'));
+    fireEvent.drop(screen.getByText('Resolved'));
+
+    // Wait for API call to finish
+    await waitFor(() => expect(updateTicket).toHaveBeenCalledTimes(1));
+
+    // Check if the ticket is moved to the 'resolved' column
+    expect(screen.getByText('Test Ticket')).toHaveTextContent('resolved');
+  });
+});
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
+
+Backend - Test for Ticket Migration (API)
+
+
+// ticket.test.js (Backend - API)
+
+const request = require('supertest');
+const app = require('../app');  // Express server
+const { Ticket } = require('../models');  // Ticket model
+
+jest.mock('../models');  // Mock the Ticket model
+
+describe('PUT /tickets/:id', () => {
+  it('should update ticket status after moving', async () => {
+    const mockUpdatedTicket = {
+      id: 6,
+      title: 'Test Ticket',
+      description: 'This is a test ticket',
+      status: 'resolved',
+      updated_at: new Date().toISOString(),
+    };
+
+    Ticket.findByIdAndUpdate.mockResolvedValue(mockUpdatedTicket);  // Mock the database update response
+
+    const response = await request(app)
+      .put('/tickets/6')
+      .send({ status: 'resolved', updated_at: new Date().toISOString() });
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe('resolved');
+    expect(response.body.updated_at).toBeDefined();
+  });
+});
+
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
+
+3. Tool settings
+Jest settings for Frontend
+In the package.json file, set jest like this:
+
+
+{
+  "jest": {
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
+    },
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-dom/extend-expect"
+    ]
+  }
+}
+
+
+Setting up Jest for Backend
+In your package.json or jest.config.js file, set up jest like this:
+
+
+{
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
+    }
+  }
+}
+///////////////////////////////////////////////////////////////////////////////////
+
+
+
+4. Preliminary Testing
+Adding Ticket: Test that when the form is filled in and the submit button is pressed, the system can create a new ticket and display it in the UI
+Moving Ticket: Test that when a ticket is dragged to a new status (e.g. from pending to resolved), the system can update the status correctly and display it in the UI
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
+5. E2E Testing
+Use tools like Cypress to test the functionality from the UI to the API:
+
+
+// cypress/integration/kanban_board_spec.js
+
+describe('Kanban Board E2E', () => {
+  it('should allow users to create and move tickets', () => {
+    // Create a new ticket via the frontend
+    cy.visit('/');
+    cy.get('[data-cy=create-ticket-button]').click();
+    cy.get('[data-cy=title-input]').type('New Ticket');
+    cy.get('[data-cy=description-input]').type('Description of the new ticket');
+    cy.get('[data-cy=submit-button]').click();
+
+    // Check that the new ticket appears in the pending column
+    cy.get('[data-cy=pending-column]').should('contain', 'New Ticket');
+
+    // Move the ticket to the resolved column
+    cy.get('[data-cy=pending-column] .ticket').drag('[data-cy=resolved-column]');
+    cy.get('[data-cy=resolved-column]').should('contain', 'New Ticket');
+  });
+});
+
+

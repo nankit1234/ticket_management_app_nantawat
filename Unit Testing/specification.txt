@@ -1,0 +1,175 @@
+API Specification (
+Base URL http://localhost:8000
+///////////////////////////////////////////////////////////////////////////////////
+Ticket Management Endpoints
+GET /tickets
+Description: Fetch a list of all tickets in the system.
+Method: GET
+Request Parameters: None
+Response:
+200 OK: A list of ticket objects.
+Example Response:
+
+json
+
+[
+  {
+    "id": 1,
+    "title": "Test Ticket",
+    "description": "This is a test ticket",
+    "contact_info": "test@example.com",
+    "status": "pending",
+    "updated_at": "2024-11-11T00:00:00",
+    "created_at": "2024-11-11T00:00:00"
+  },
+  {
+    "id": 2,
+    "title": "Another Test Ticket",
+    "description": "Details of another test ticket",
+    "contact_info": "another@example.com",
+    "status": "resolved",
+    "updated_at": "2024-11-11T00:00:00",
+    "created_at": "2024-11-11T00:00:00"
+  }
+]
+
+500 Internal Server Error: If there is an error fetching tickets from the database.
+
+///////////////////////////////////////////////////////////////////////////////////
+POST /tickets
+Description: Create a new ticket.
+Method: POST
+Request Body:
+
+json
+
+{
+  "title": "Issue with login",
+  "description": "User cannot login to the system",
+  "contact_info": "user@example.com",
+  "status": "pending"
+}
+Response:
+201 Created: Returns the created ticket object.
+Example Response:
+json
+
+{
+  "id": 3,
+  "title": "Issue with login",
+  "description": "User cannot login to the system",
+  "contact_info": "user@example.com",
+  "status": "pending",
+  "updated_at": "2024-11-11T00:00:00",
+  "created_at": "2024-11-11T00:00:00"
+}
+
+400 Bad Request: If the input is invalid or required fields are missing.
+500 Internal Server Error: If there is an error creating the ticket.
+
+///////////////////////////////////////////////////////////////////////////////////
+
+PUT /tickets/{ticket_id}
+Description: Update the status of a ticket.
+Method: PUT
+Path Parameters:
+ticket_id (integer): The ID of the ticket to update.
+Request Body:
+json
+
+{
+  "status": "resolved"
+}
+Response:
+200 OK: Returns the updated ticket object.
+Example Response:
+json
+
+{
+  "id": 3,
+  "title": "Issue with login",
+  "description": "User cannot login to the system",
+  "contact_info": "user@example.com",
+  "status": "resolved",
+  "updated_at": "2024-11-11T00:00:00",
+  "created_at": "2024-11-11T00:00:00"
+}
+
+404 Not Found: If the ticket with the specified ID does not exist.
+500 Internal Server Error: If there is an error updating the ticket status.
+
+///////////////////////////////////////////////////////////////////////////////////
+
+DELETE /tickets/{ticket_id}
+Description: Delete a ticket by ID.
+Method: DELETE
+Path Parameters:
+ticket_id (integer): The ID of the ticket to delete.
+Response:
+200 OK: Returns the deleted ticket object.
+Example Response:
+json
+
+{
+  "id": 3,
+  "title": "Issue with login",
+  "description": "User cannot login to the system",
+  "contact_info": "user@example.com",
+  "status": "pending",
+  "updated_at": "2024-11-11T00:00:00",
+  "created_at": "2024-11-11T00:00:00"
+}
+
+404 Not Found: If the ticket with the specified ID does not exist.
+500 Internal Server Error: If there is an error deleting the ticket.
+
+///////////////////////////////////////////////////////////////////////////////////
+
+General Error Responses
+404 Not Found: The specified resource (ticket) could not be found.
+Example Response:
+json
+
+{
+  "detail": "Ticket not found"
+}
+500 Internal Server Error: There was a problem with the server while processing the request.
+
+///////////////////////////////////////////////////////////////////////////////////
+
+Example Response:
+json
+
+{
+  "detail": "Error creating ticket"
+}
+///////////////////////////////////////////////////////////////////////////////////
+
+Models
+
+TicketResponse
+json
+{
+  "id": 1,
+  "title": "string",
+  "description": "string",
+  "contact_info": "string",
+  "status": "string",
+  "updated_at": "datetime",
+  "created_at": "datetime"
+}
+
+TicketCreate
+json
+{
+  "title": "string",
+  "description": "string",
+  "contact_info": "string",
+  "status": "string"
+}
+
+TicketUpdate
+json
+{
+  "status": "string"
+}

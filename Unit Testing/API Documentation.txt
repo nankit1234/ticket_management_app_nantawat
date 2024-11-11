@@ -1,0 +1,236 @@
+openapi: 3.0.0
+info:
+  title: Ticket Management API
+  description: API for managing tickets in a Kanban system.
+  version: 1.0.0
+  contact:
+    name: Support Team
+    email: support@example.com
+    url: https://www.example.com
+
+servers:
+  - url: 'https://api.example.com/v1'
+    description: 'Production server'
+
+paths:
+  /tickets:
+    post:
+      summary: 'Create a new ticket'
+      description: 'Use this endpoint to create a new ticket in the system.'
+      operationId: createTicket
+      requestBody:
+        description: 'The data of the new ticket to be created.'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - status
+              properties:
+                title:
+                  type: string
+                  description: 'The title of the ticket.'
+                description:
+                  type: string
+                  description: 'The description of the ticket.'
+                status:
+                  type: string
+                  enum: ['pending', 'resolved', 'rejected', 'accepted']
+                  description: 'The status of the ticket.'
+      responses:
+        '201':
+          description: 'Ticket was successfully created.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: 'The ID of the ticket.'
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  status:
+                    type: string
+                  updated_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: 'Bad request due to incorrect data.'
+
+  /tickets/{id}:
+    put:
+      summary: 'Update the status of a ticket'
+      description: 'Use this endpoint to update the status of a specific ticket.'
+      operationId: updateTicket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'The ID of the ticket to be updated.'
+          schema:
+            type: integer
+      requestBody:
+        description: 'The updated data, such as status and updated_at.'
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: ['pending', 'resolved', 'rejected', 'accepted']
+                  description: 'The new status of the ticket.'
+                updated_at:
+                  type: string
+                  format: date-time
+                  description: 'The date and time the ticket was updated.'
+      responses:
+        '200':
+          description: 'Ticket was successfully updated.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  status:
+                    type: string
+                  updated_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: 'Bad request due to incorrect data.'
+        '404':
+          description: 'Ticket not found.'
+
+  /tickets/{id}:
+    get:
+      summary: 'Retrieve ticket information'
+      description: 'Use this endpoint to retrieve the details of a specific ticket.'
+      operationId: getTicket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'The ID of the ticket to retrieve.'
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Ticket information retrieved successfully.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  status:
+                    type: string
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: 'Ticket not found.'
+
+  /tickets:
+    get:
+      summary: 'Retrieve all tickets'
+      description: 'Use this endpoint to retrieve all tickets in the system.'
+      operationId: getAllTickets
+      responses:
+        '200':
+          description: 'List of all tickets.'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    status:
+                      type: string
+                    updated_at:
+                      type: string
+                      format: date-time
+
+components:
+  schemas:
+    Ticket:
+      type: object
+      required:
+        - title
+        - description
+        - status
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: ['pending', 'resolved', 'rejected', 'accepted']
+        updated_at:
+          type: string
+          format: date-time
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
+Explanation of the API Documentation
+1.POST /tickets: Create a new ticket.
+2.PUT /tickets/{id}: Update the status of a specific ticket by its id.
+3.GET /tickets/{id}: Retrieve the details of a specific ticket by its id.
+4.GET /tickets: Retrieve all tickets in the system.
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
+
+Setting Up Swagger for API Documentation
+**Install Swagger in  project:**
+
+1.npm install swagger-ui-express yamljs
+2.Set up Swagger in app.js or server.js:
+
+   const express = require('express');
+   const swaggerUi = require('swagger-ui-express');
+   const yaml = require('yamljs');
+   const app = express();
+
+const swaggerDocument = yaml.load('./swagger.yaml'); // path to the YAML file
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// other code to set up server...
+.
+.
+.
+
+
+
+Start the server and open the API Documentation page by going to http://localhost:3000/api-docs.
+
